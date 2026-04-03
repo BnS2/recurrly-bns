@@ -1,0 +1,18 @@
+# Ignore node_modules
+node_modules
+# Ignore build artifacts
+dist
+build
+.expo
+.next
+# Ignore lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+# Ignore local environment files
+.env*
+# Ignore logs
+logs
+*.log
+# Ignore DS_Store
+.DS_Store

@@ -43,6 +43,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ef551f0b-929d-46c5-a2a1-bc3c7ff8da1b"
+      }
+    },
+    "owner": "bns-dev"
   }
 }
