@@ -15,6 +15,11 @@ import SafeAreaView from "@/components/StyledSafeAreaView";
 import { logger } from "@/lib/logger";
 import { backupCodeSchema, mfaSchema, signInSchema } from "@/lib/validations";
 
+type SignInSecondFactor = {
+	strategy: "email_code" | "phone_code" | "totp" | "backup_code" | string;
+	[key: string]: unknown;
+};
+
 export default function SignInScreen() {
 	const { signIn, errors, fetchStatus } = useSignIn();
 	const router = useRouter();
@@ -22,7 +27,7 @@ export default function SignInScreen() {
 	const [emailAddress, setEmailAddress] = useState("");
 	const [password, setPassword] = useState("");
 	const [code, setCode] = useState("");
-	const [selectedFactor, setSelectedFactor] = useState<any>(null);
+	const [selectedFactor, setSelectedFactor] = useState<SignInSecondFactor | null>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [touched, setTouched] = useState({ email: false, password: false, code: false });
 
@@ -86,6 +91,9 @@ export default function SignInScreen() {
 				result = await signIn.mfa.verifyTOTP({ code });
 			} else if (selectedFactor.strategy === "backup_code") {
 				result = await signIn.mfa.verifyBackupCode({ code });
+			} else {
+				setError("Unsupported MFA strategy");
+				return;
 			}
 
 			if (result?.error) {
@@ -143,6 +151,9 @@ export default function SignInScreen() {
 							setError(error.message || "Failed to send verification code.");
 						}
 					}
+				} else {
+					setSelectedFactor(null);
+					setError("No supported multi-factor authentication methods available.");
 				}
 			} else {
 				logger.error("Sign-in attempt not complete:", signIn);

@@ -102,8 +102,8 @@ export default function SignUpScreen() {
 					},
 				});
 			} else {
-				logger.error("Sign-up attempt not complete:", signUp);
-				setError("The code you entered is incorrect. Please double-check and try again.");
+				logger.error("Sign-up not complete:", signUp);
+				setError("Verification succeeded but your sign-up is not complete; please check for additional required steps or contact support.");
 			}
 		} catch (e) {
 			logger.error("Verification Exception:", e);
