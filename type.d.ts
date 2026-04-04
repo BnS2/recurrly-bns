@@ -44,10 +44,11 @@ declare global {
     daysLeft: number;
   }
 
-  interface UpcomingSubscriptionCardProps extends Omit<UpcomingSubscription, "id"> {}
+  type UpcomingSubscriptionCardProps = Omit<UpcomingSubscription, "id">;
 
   interface ListHeadingProps {
     title: string;
+    onViewAll?: () => void;
   }
 }
 
