@@ -69,8 +69,14 @@ export default function SignUpScreen() {
 		if (signUp.status === "complete") {
 			await signUp.finalize({
 				navigate: ({ decorateUrl, session }) => {
-					if (session?.currentTask) {
-						const url = decorateUrl(`/(tabs)?task=${session.currentTask}`);
+					if (session?.currentTask?.key) {
+						const taskMap: Record<string, string> = {
+							"choose-organization": "/(tabs)/select-org",
+							"reset-password": "/(auth)/reset-password",
+							"setup-mfa": "/(auth)/mfa-setup",
+						};
+						const taskRoute = taskMap[session.currentTask.key] || "/(tabs)";
+						const url = decorateUrl(taskRoute);
 						router.replace(url as Href);
 					} else {
 						const url = decorateUrl("/(tabs)");
@@ -151,7 +157,7 @@ export default function SignUpScreen() {
 										{isLoading ? (
 											<ActivityIndicator color="#081126" />
 										) : (
-											<Text className="auth-button-text">Verify</Text>
+											<Text className="auth-button-text-on-accent">Verify</Text>
 										)}
 									</TouchableOpacity>
 
@@ -245,7 +251,7 @@ export default function SignUpScreen() {
 									{isLoading ? (
 										<ActivityIndicator color="#081126" />
 									) : (
-										<Text className="auth-button-text">Sign Up</Text>
+										<Text className="auth-button-text-on-accent">Sign Up</Text>
 									)}
 								</TouchableOpacity>
 							</View>

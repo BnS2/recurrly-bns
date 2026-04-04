@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import SafeAreaView from "@/components/StyledSafeAreaView";
 import { logger } from "@/lib/logger";
-import { mfaSchema, signInSchema } from "@/lib/validations";
+import { backupCodeSchema, mfaSchema, signInSchema } from "@/lib/validations";
 
 export default function SignInScreen() {
 	const { signIn, errors, fetchStatus } = useSignIn();
@@ -22,7 +22,7 @@ export default function SignInScreen() {
 	const [emailAddress, setEmailAddress] = useState("");
 	const [password, setPassword] = useState("");
 	const [code, setCode] = useState("");
-	const [isVerifyingMfa, setIsVerifyingMfa] = useState(false);
+	const [selectedFactor, setSelectedFactor] = useState<any>(null);
 	const [error, setError] = useState<string | null>(null);
 	const [touched, setTouched] = useState({ email: false, password: false, code: false });
 
@@ -34,7 +34,10 @@ export default function SignInScreen() {
 	const isPasswordValid = passwordParse.success;
 	const passwordErrorMsg = passwordParse.success ? "" : passwordParse.error.issues[0].message;
 
-	const codeParse = mfaSchema.shape.code.safeParse(code);
+	const isBackupCode = selectedFactor?.strategy === "backup_code";
+	const codeParse = isBackupCode
+		? backupCodeSchema.shape.code.safeParse(code)
+		: mfaSchema.shape.code.safeParse(code);
 	const isCodeValid = codeParse.success;
 	const codeErrorMsg = codeParse.success ? "" : codeParse.error.issues[0].message;
 
@@ -64,27 +67,19 @@ export default function SignInScreen() {
 
 		setError(null);
 
-		const factor = signIn.supportedSecondFactors.find(
-			(f) =>
-				f.strategy === "email_code" ||
-				f.strategy === "phone_code" ||
-				f.strategy === "totp" ||
-				f.strategy === "backup_code",
-		);
-
-		if (!factor) {
-			setError("No supported verification method found.");
+		if (!selectedFactor) {
+			setError("No verification method selected.");
 			return;
 		}
 
 		let result: { error?: unknown } | undefined;
-		if (factor.strategy === "email_code") {
+		if (selectedFactor.strategy === "email_code") {
 			result = await signIn.mfa.verifyEmailCode({ code });
-		} else if (factor.strategy === "phone_code") {
+		} else if (selectedFactor.strategy === "phone_code") {
 			result = await signIn.mfa.verifyPhoneCode({ code });
-		} else if (factor.strategy === "totp") {
+		} else if (selectedFactor.strategy === "totp") {
 			result = await signIn.mfa.verifyTOTP({ code });
-		} else if (factor.strategy === "backup_code") {
+		} else if (selectedFactor.strategy === "backup_code") {
 			result = await signIn.mfa.verifyBackupCode({ code });
 		}
 
@@ -100,10 +95,15 @@ export default function SignInScreen() {
 		if (signIn.status === "complete") {
 			await signIn.finalize({
 				navigate: ({ decorateUrl, session }) => {
-					if (session?.currentTask) {
-						// Branch to specific task-handling routes if needed
-						// For now, we still use decorateUrl but prioritize the task-aware path
-						const url = decorateUrl(`/(tabs)?task=${session.currentTask}`);
+					if (session?.currentTask?.key) {
+						// Map Clerk task keys to our routes or use a parameterized approach
+						const taskMap: Record<string, string> = {
+							"choose-organization": "/(tabs)/select-org",
+							"reset-password": "/(auth)/reset-password",
+							"setup-mfa": "/(auth)/mfa-setup",
+						};
+						const taskRoute = taskMap[session.currentTask.key] || "/(tabs)";
+						const url = decorateUrl(taskRoute);
 						router.replace(url as Href);
 					} else {
 						const url = decorateUrl("/(tabs)");
@@ -112,11 +112,21 @@ export default function SignInScreen() {
 				},
 			});
 		} else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") {
-			setIsVerifyingMfa(true);
-			// For simplicity, we send the code to email if it's a supported strategy
-			const emailCodeFactor = signIn.supportedSecondFactors.find((factor) => factor.strategy === "email_code");
-			if (emailCodeFactor) {
-				await signIn.mfa.sendEmailCode();
+			const factor = signIn.supportedSecondFactors.find(
+				(f) =>
+					f.strategy === "email_code" ||
+					f.strategy === "phone_code" ||
+					f.strategy === "totp" ||
+					f.strategy === "backup_code",
+			);
+
+			if (factor) {
+				setSelectedFactor(factor);
+				if (factor.strategy === "email_code") {
+					await signIn.mfa.sendEmailCode();
+				} else if (factor.strategy === "phone_code") {
+					await signIn.mfa.sendPhoneCode();
+				}
 			}
 		} else {
 			logger.error("Sign-in attempt not complete:", signIn);
@@ -126,7 +136,7 @@ export default function SignInScreen() {
 
 	const isLoading = fetchStatus === "fetching";
 
-	if (isVerifyingMfa) {
+	if (selectedFactor) {
 		return (
 			<SafeAreaView className="auth-safe-area">
 				<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="flex-1">
@@ -146,7 +156,11 @@ export default function SignInScreen() {
 
 							<View className="mt-4 items-center">
 								<Text className="auth-title">{"Verify it's you"}</Text>
-								<Text className="auth-subtitle">Final step: Enter the 6-digit code sent to your email.</Text>
+								<Text className="auth-subtitle">
+									{selectedFactor.strategy === "backup_code"
+										? "Enter one of your saved backup codes."
+										: `Final step: Enter the code sent via ${selectedFactor.strategy.split("_")[0]}.`}
+								</Text>
 							</View>
 
 							<View className="auth-card">
@@ -161,8 +175,8 @@ export default function SignInScreen() {
 											placeholderTextColor="rgba(0,0,0,0.3)"
 											onChangeText={setCode}
 											onBlur={() => setTouched((prev) => ({ ...prev, code: true }))}
-											keyboardType="numeric"
-											maxLength={6}
+											keyboardType={isBackupCode ? "default" : "numeric"}
+											maxLength={isBackupCode ? 20 : 6}
 										/>
 										{touched.code && !isCodeValid ? (
 											<Text className="auth-error text-center">{codeErrorMsg}</Text>
@@ -180,7 +194,7 @@ export default function SignInScreen() {
 										{isLoading ? (
 											<ActivityIndicator color="#081126" />
 										) : (
-											<Text className="auth-button-text">Verify & Sign In</Text>
+											<Text className="auth-button-text-on-accent">Verify & Sign In</Text>
 										)}
 									</TouchableOpacity>
 
@@ -188,7 +202,7 @@ export default function SignInScreen() {
 										className="auth-secondary-button mt-2"
 										onPress={() => {
 											signIn.reset();
-											setIsVerifyingMfa(false);
+											setSelectedFactor(null);
 										}}
 										disabled={isLoading}
 									>
@@ -277,7 +291,7 @@ export default function SignInScreen() {
 									{isLoading ? (
 										<ActivityIndicator color="#081126" />
 									) : (
-										<Text className="auth-button-text">Sign In</Text>
+										<Text className="auth-button-text-on-accent">Sign In</Text>
 									)}
 								</TouchableOpacity>
 							</View>
