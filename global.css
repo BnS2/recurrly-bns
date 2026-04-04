@@ -75,7 +75,7 @@
   }
 
   .home-user-name {
-    @apply font-sans-bold text-primary ml-4 text-2xl;
+    @apply ml-4 font-sans-bold text-2xl text-primary;
   }
 
   .home-add-icon {
@@ -83,7 +83,7 @@
   }
 
   .home-balance-card {
-    @apply bg-accent my-2.5 min-h-50 justify-between gap-5 rounded-tr-4xl rounded-bl-4xl p-6;
+    @apply my-2.5 min-h-50 justify-between gap-5 rounded-tr-4xl rounded-bl-4xl bg-accent p-6;
   }
 
   .home-balance-label {
@@ -107,7 +107,7 @@
   }
 
   .list-title {
-    @apply font-sans-bold text-primary text-2xl;
+    @apply font-sans-bold text-2xl text-primary;
   }
 
   .list-action {
@@ -115,11 +115,11 @@
   }
 
   .list-action-text {
-    @apply font-sans-semibold text-primary text-lg;
+    @apply font-sans-semibold text-lg text-primary;
   }
 
   .upcoming-card {
-    @apply bg-background mr-4 w-44 rounded-2xl border border-black/10 p-4;
+    @apply mr-4 w-44 rounded-2xl border border-black/10 bg-background p-4;
   }
 
   .upcoming-row {
@@ -131,19 +131,19 @@
   }
 
   .upcoming-price {
-    @apply font-sans-bold text-primary text-lg;
+    @apply font-sans-bold text-lg text-primary;
   }
 
   .upcoming-meta {
-    @apply font-sans-semibold text-muted-foreground text-sm;
+    @apply font-sans-semibold text-sm text-muted-foreground;
   }
 
   .upcoming-name {
-    @apply font-sans-bold text-primary mt-2 text-lg;
+    @apply mt-2 font-sans-bold text-lg text-primary;
   }
 
   .sub-card {
-    @apply border-border rounded-2xl border p-4;
+    @apply rounded-2xl border border-border p-4;
   }
 
   .sub-card-expanded {
@@ -167,11 +167,11 @@
   }
 
   .sub-title {
-    @apply font-sans-bold text-primary mb-1 text-lg;
+    @apply mb-1 font-sans-bold text-lg text-primary;
   }
 
   .sub-meta {
-    @apply font-sans-semibold text-muted-foreground text-sm;
+    @apply font-sans-semibold text-sm text-muted-foreground;
   }
 
   .sub-price-box {
@@ -179,11 +179,11 @@
   }
 
   .sub-price {
-    @apply font-sans-bold text-primary mb-1 text-lg;
+    @apply mb-1 font-sans-bold text-lg text-primary;
   }
 
   .sub-billing {
-    @apply font-sans-medium text-muted-foreground text-sm;
+    @apply font-sans-medium text-sm text-muted-foreground;
   }
 
   .sub-body {
@@ -203,15 +203,15 @@
   }
 
   .sub-label {
-    @apply font-sans-medium text-muted-foreground shrink-0 text-base;
+    @apply shrink-0 font-sans-medium text-base text-muted-foreground;
   }
 
   .sub-value {
-    @apply font-sans-bold text-primary flex-1;
+    @apply flex-1 font-sans-bold text-primary;
   }
 
   .sub-cancel {
-    @apply bg-primary mt-2 items-center rounded-full py-4;
+    @apply mt-2 items-center rounded-full bg-primary py-4;
   }
 
   .sub-cancel-disabled {
@@ -223,15 +223,15 @@
   }
 
   .home-empty-state {
-    @apply font-sans-medium py-4 text-sm text-black/60;
+    @apply py-4 font-sans-medium text-sm text-black/60;
   }
 
   .auth-safe-area {
-    @apply bg-background flex-1;
+    @apply flex-1 bg-background;
   }
 
   .auth-screen {
-    @apply bg-background flex-1;
+    @apply flex-1 bg-background;
   }
 
   .auth-scroll {
@@ -251,31 +251,31 @@
   }
 
   .auth-logo-mark {
-    @apply bg-accent relative size-14 items-center justify-center rounded-2xl;
+    @apply relative size-14 items-center justify-center rounded-2xl bg-accent;
   }
 
   .auth-logo-mark-text {
-    @apply font-sans-extrabold text-background text-2xl;
+    @apply font-sans-extrabold text-2xl text-background;
   }
 
   .auth-wordmark {
-    @apply font-sans-extrabold text-primary text-3xl;
+    @apply font-sans-extrabold text-3xl text-primary;
   }
 
   .auth-wordmark-sub {
-    @apply font-sans-semibold text-muted-foreground -mt-1 text-xs tracking-[1px] uppercase;
+    @apply -mt-1 font-sans-semibold text-xs tracking-[1px] text-muted-foreground uppercase;
   }
 
   .auth-title {
-    @apply font-sans-bold text-primary text-3xl;
+    @apply font-sans-bold text-3xl text-primary;
   }
 
   .auth-subtitle {
-    @apply font-sans-medium text-muted-foreground mt-2 max-w-[320px] text-center text-base;
+    @apply mt-2 max-w-[320px] text-center font-sans-medium text-base text-muted-foreground;
   }
 
   .auth-card {
-    @apply border-border bg-card mt-8 rounded-3xl border p-5;
+    @apply mt-8 rounded-3xl border border-border bg-card p-5;
   }
 
   .auth-form {
@@ -287,11 +287,11 @@
   }
 
   .auth-label {
-    @apply font-sans-semibold text-primary text-sm;
+    @apply font-sans-semibold text-sm text-primary;
   }
 
   .auth-input {
-    @apply border-border bg-background font-sans-medium text-primary rounded-2xl border px-4 py-4 text-base;
+    @apply rounded-2xl border border-border bg-background px-4 py-4 font-sans-medium text-base text-primary;
   }
 
   .auth-input-error {
@@ -299,15 +299,15 @@
   }
 
   .auth-error {
-    @apply font-sans-medium text-destructive text-xs;
+    @apply font-sans-medium text-xs text-destructive;
   }
 
   .auth-helper {
-    @apply font-sans-medium text-muted-foreground text-sm;
+    @apply font-sans-medium text-sm text-muted-foreground;
   }
 
   .auth-button {
-    @apply bg-accent mt-1 items-center rounded-2xl py-4;
+    @apply mt-1 items-center rounded-2xl bg-accent py-4;
   }
 
   .auth-button-disabled {
@@ -315,15 +315,15 @@
   }
 
   .auth-button-text {
-    @apply font-sans-bold text-primary text-base;
+    @apply font-sans-bold text-base text-primary;
   }
 
   .auth-secondary-button {
-    @apply border-accent/30 bg-accent/10 items-center rounded-2xl border py-3;
+    @apply items-center rounded-2xl border border-accent/30 bg-accent/10 py-3;
   }
 
   .auth-secondary-button-text {
-    @apply font-sans-semibold text-accent text-sm;
+    @apply font-sans-semibold text-sm text-accent;
   }
 
   .auth-divider-row {
@@ -331,11 +331,11 @@
   }
 
   .auth-divider-line {
-    @apply bg-border h-px flex-1;
+    @apply h-px flex-1 bg-border;
   }
 
   .auth-divider-text {
-    @apply font-sans-semibold text-muted-foreground text-[11px] tracking-[1px] uppercase;
+    @apply font-sans-semibold text-[11px] tracking-[1px] text-muted-foreground uppercase;
   }
 
   .auth-link-row {
@@ -343,11 +343,11 @@
   }
 
   .auth-link-copy {
-    @apply font-sans-medium text-muted-foreground text-sm;
+    @apply font-sans-medium text-sm text-muted-foreground;
   }
 
   .auth-link {
-    @apply font-sans-bold text-accent text-sm;
+    @apply font-sans-bold text-sm text-accent;
   }
 
   .modal-overlay {
@@ -355,23 +355,23 @@
   }
 
   .modal-container {
-    @apply bg-background mt-auto max-h-[85%] rounded-t-3xl;
+    @apply mt-auto max-h-[85%] rounded-t-3xl bg-background;
   }
 
   .modal-header {
-    @apply border-border flex-row items-center justify-between border-b px-5 py-4;
+    @apply flex-row items-center justify-between border-b border-border px-5 py-4;
   }
 
   .modal-title {
-    @apply font-sans-bold text-primary text-xl;
+    @apply font-sans-bold text-xl text-primary;
   }
 
   .modal-close {
-    @apply bg-muted size-8 items-center justify-center rounded-full;
+    @apply size-8 items-center justify-center rounded-full bg-muted;
   }
 
   .modal-close-text {
-    @apply font-sans-bold text-primary text-lg;
+    @apply font-sans-bold text-lg text-primary;
   }
 
   .modal-body {
@@ -383,7 +383,7 @@
   }
 
   .picker-option {
-    @apply border-border bg-background flex-1 items-center rounded-2xl border py-3;
+    @apply flex-1 items-center rounded-2xl border border-border bg-background py-3;
   }
 
   .picker-option-active {
@@ -391,7 +391,7 @@
   }
 
   .picker-option-text {
-    @apply font-sans-semibold text-muted-foreground text-sm;
+    @apply font-sans-semibold text-sm text-muted-foreground;
   }
 
   .picker-option-text-active {
@@ -403,7 +403,7 @@
   }
 
   .category-chip {
-    @apply border-border bg-background rounded-full border px-4 py-2;
+    @apply rounded-full border border-border bg-background px-4 py-2;
   }
 
   .category-chip-active {
@@ -411,7 +411,7 @@
   }
 
   .category-chip-text {
-    @apply font-sans-semibold text-muted-foreground text-sm;
+    @apply font-sans-semibold text-sm text-muted-foreground;
   }
 
   .category-chip-text-active {
