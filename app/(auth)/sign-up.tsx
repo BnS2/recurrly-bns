@@ -54,7 +54,12 @@ export default function SignUpScreen() {
 			return;
 		}
 
-		await signUp.verifications.sendEmailCode();
+		const { error: sendError } = await signUp.verifications.sendEmailCode();
+		if (sendError) {
+			logger.error("Failed to send verification code:", sendError);
+			setError(sendError.message || "Failed to send verification code.");
+			return;
+		}
 	};
 
 	const handleVerify = async () => {
@@ -62,9 +67,15 @@ export default function SignUpScreen() {
 		if (!isCodeValid) return;
 
 		setError(null);
-		await signUp.verifications.verifyEmailCode({
+		const { error: verifyError } = await signUp.verifications.verifyEmailCode({
 			code,
 		});
+
+		if (verifyError) {
+			logger.error("Verification Failed:", verifyError);
+			setError(verifyError.message || "The code you entered is incorrect.");
+			return;
+		}
 
 		if (signUp.status === "complete") {
 			await signUp.finalize({
@@ -163,10 +174,30 @@ export default function SignUpScreen() {
 
 									<TouchableOpacity
 										className="auth-secondary-button mt-2"
-										onPress={() => signUp.verifications.sendEmailCode()}
+										onPress={async () => {
+											setError(null);
+											const { error: resendError } = await signUp.verifications.sendEmailCode();
+											if (resendError) {
+												logger.error("Resend Failed:", resendError);
+												setError(resendError.message || "Failed to resend code.");
+											}
+										}}
 										disabled={isLoading}
 									>
 										<Text className="auth-secondary-button-text">Resend Code</Text>
+									</TouchableOpacity>
+
+									<TouchableOpacity
+										className="auth-secondary-button mt-2"
+										onPress={async () => {
+											await signUp.reset();
+											setCode("");
+											setError(null);
+											setTouched((prev) => ({ ...prev, code: false }));
+										}}
+										disabled={isLoading}
+									>
+										<Text className="auth-secondary-button-text text-primary/60">Use a different email</Text>
 									</TouchableOpacity>
 								</View>
 							</View>

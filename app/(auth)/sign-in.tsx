@@ -46,19 +46,23 @@ export default function SignInScreen() {
 		if (!isEmailValid || !isPasswordValid) return;
 
 		setError(null);
+		try {
+			const { error: signInError } = await signIn.password({
+				emailAddress,
+				password,
+			});
 
-		const { error: signInError } = await signIn.password({
-			emailAddress,
-			password,
-		});
+			if (signInError) {
+				logger.error("Sign In Failed:", signInError);
+				setError(signInError.message || "Something went wrong. Please try again.");
+				return;
+			}
 
-		if (signInError) {
-			logger.error("Sign In Failed:", signInError);
-			setError(signInError.message || "Something went wrong. Please try again.");
-			return;
+			await handleSignInStatus();
+		} catch (e) {
+			logger.error("Sign In Exception:", e);
+			setError("An unexpected error occurred. Please try again.");
 		}
-
-		handleSignInStatus();
 	};
 
 	const handleVerifyMfa = async () => {
@@ -92,45 +96,56 @@ export default function SignInScreen() {
 	};
 
 	const handleSignInStatus = async () => {
-		if (signIn.status === "complete") {
-			await signIn.finalize({
-				navigate: ({ decorateUrl, session }) => {
-					if (session?.currentTask?.key) {
-						// Map Clerk task keys to our routes or use a parameterized approach
-						const taskMap: Record<string, string> = {
-							"choose-organization": "/(tabs)/select-org",
-							"reset-password": "/(auth)/reset-password",
-							"setup-mfa": "/(auth)/mfa-setup",
-						};
-						const taskRoute = taskMap[session.currentTask.key] || "/(tabs)";
-						const url = decorateUrl(taskRoute);
-						router.replace(url as Href);
-					} else {
-						const url = decorateUrl("/(tabs)");
-						router.replace(url as Href);
-					}
-				},
-			});
-		} else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") {
-			const factor = signIn.supportedSecondFactors.find(
-				(f) =>
-					f.strategy === "email_code" ||
-					f.strategy === "phone_code" ||
-					f.strategy === "totp" ||
-					f.strategy === "backup_code",
-			);
+		try {
+			if (signIn.status === "complete") {
+				await signIn.finalize({
+					navigate: ({ decorateUrl, session }) => {
+						if (session?.currentTask?.key) {
+							// Map Clerk task keys to our routes or use a parameterized approach
+							const taskMap: Record<string, string> = {
+								"choose-organization": "/(tabs)/select-org",
+								"reset-password": "/(auth)/reset-password",
+								"setup-mfa": "/(auth)/mfa-setup",
+							};
+							const taskRoute = taskMap[session.currentTask.key] || "/(auth)/task-recovery";
+							const url = decorateUrl(taskRoute);
+							router.replace(url as Href);
+						} else {
+							const url = decorateUrl("/(tabs)");
+							router.replace(url as Href);
+						}
+					},
+				});
+			} else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") {
+				const factor = signIn.supportedSecondFactors.find(
+					(f) =>
+						f.strategy === "email_code" ||
+						f.strategy === "phone_code" ||
+						f.strategy === "totp" ||
+						f.strategy === "backup_code",
+				);
 
-			if (factor) {
-				setSelectedFactor(factor);
-				if (factor.strategy === "email_code") {
-					await signIn.mfa.sendEmailCode();
-				} else if (factor.strategy === "phone_code") {
-					await signIn.mfa.sendPhoneCode();
+				if (factor) {
+					setSelectedFactor(factor);
+					if (factor.strategy === "email_code") {
+						const { error } = await signIn.mfa.sendEmailCode();
+						if (error) {
+							setError(error.message || "Failed to send verification code.");
+						}
+					} else if (factor.strategy === "phone_code") {
+						const { error } = await signIn.mfa.sendPhoneCode();
+						if (error) {
+							setError(error.message || "Failed to send verification code.");
+						}
+					}
 				}
+			} else {
+				logger.error("Sign-in attempt not complete:", signIn);
+				setError("Sign-in incomplete. Please check your credentials.");
 			}
-		} else {
-			logger.error("Sign-in attempt not complete:", signIn);
-			setError("Sign-in incomplete. Please check your credentials.");
+		} catch (e) {
+			logger.error("Error in handleSignInStatus:", e);
+			setError("An error occurred during sign-in. Please try again.");
 		}
 	};
 
