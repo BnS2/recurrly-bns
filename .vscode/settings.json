@@ -23,5 +23,19 @@
 	},
 	"[jsonc]": {
 		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"tailwindCSS.experimental.configFile": "global.css",
+	"emmet.includeLanguages": {
+		"javascript": "javascriptreact",
+		"typescript": "typescriptreact"
+	},
+	"emmet.triggerExpansionOnTab": true,
+	"emmet.syntaxProfiles": {
+		"javascriptreact": {
+			"className": true
+		},
+		"typescriptreact": {
+			"className": true
+		}
 	}
 }
