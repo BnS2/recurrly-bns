@@ -76,23 +76,28 @@ export default function SignInScreen() {
 			return;
 		}
 
-		let result: { error?: unknown } | undefined;
-		if (selectedFactor.strategy === "email_code") {
-			result = await signIn.mfa.verifyEmailCode({ code });
-		} else if (selectedFactor.strategy === "phone_code") {
-			result = await signIn.mfa.verifyPhoneCode({ code });
-		} else if (selectedFactor.strategy === "totp") {
-			result = await signIn.mfa.verifyTOTP({ code });
-		} else if (selectedFactor.strategy === "backup_code") {
-			result = await signIn.mfa.verifyBackupCode({ code });
-		}
+		try {
+			let result: { error?: unknown } | undefined;
+			if (selectedFactor.strategy === "email_code") {
+				result = await signIn.mfa.verifyEmailCode({ code });
+			} else if (selectedFactor.strategy === "phone_code") {
+				result = await signIn.mfa.verifyPhoneCode({ code });
+			} else if (selectedFactor.strategy === "totp") {
+				result = await signIn.mfa.verifyTOTP({ code });
+			} else if (selectedFactor.strategy === "backup_code") {
+				result = await signIn.mfa.verifyBackupCode({ code });
+			}
 
-		if (result?.error) {
-			setError("The code you entered is incorrect. Please double-check and try again.");
-			return;
-		}
+			if (result?.error) {
+				setError("The code you entered is incorrect. Please double-check and try again.");
+				return;
+			}
 
-		handleSignInStatus();
+			await handleSignInStatus();
+		} catch (e) {
+			logger.error("MFA Verification Exception:", e);
+			setError("An unexpected error occurred during verification. Please try again.");
+		}
 	};
 
 	const handleSignInStatus = async () => {
@@ -218,6 +223,9 @@ export default function SignInScreen() {
 										onPress={() => {
 											signIn.reset();
 											setSelectedFactor(null);
+											setError(null);
+											setCode("");
+											setTouched((prev) => ({ ...prev, code: false }));
 										}}
 										disabled={isLoading}
 									>

@@ -43,22 +43,27 @@ export default function SignUpScreen() {
 		if (!isEmailValid || !isPasswordValid) return;
 
 		setError(null);
-		const { error: signUpError } = await signUp.password({
-			emailAddress,
-			password,
-		});
+		try {
+			const { error: signUpError } = await signUp.password({
+				emailAddress,
+				password,
+			});
 
-		if (signUpError) {
-			logger.error("Sign Up Failed:", signUpError);
-			setError(signUpError.message || "Failed to create account. Please try again.");
-			return;
-		}
+			if (signUpError) {
+				logger.error("Sign Up Failed:", signUpError);
+				setError(signUpError.message || "Failed to create account. Please try again.");
+				return;
+			}
 
-		const { error: sendError } = await signUp.verifications.sendEmailCode();
-		if (sendError) {
-			logger.error("Failed to send verification code:", sendError);
-			setError(sendError.message || "Failed to send verification code.");
-			return;
+			const { error: sendError } = await signUp.verifications.sendEmailCode();
+			if (sendError) {
+				logger.error("Failed to send verification code:", sendError);
+				setError(sendError.message || "Failed to send verification code.");
+				return;
+			}
+		} catch (e) {
+			logger.error("Sign Up Exception:", e);
+			setError("An unexpected error occurred during sign up. Please try again.");
 		}
 	};
 
@@ -67,37 +72,42 @@ export default function SignUpScreen() {
 		if (!isCodeValid) return;
 
 		setError(null);
-		const { error: verifyError } = await signUp.verifications.verifyEmailCode({
-			code,
-		});
-
-		if (verifyError) {
-			logger.error("Verification Failed:", verifyError);
-			setError(verifyError.message || "The code you entered is incorrect.");
-			return;
-		}
-
-		if (signUp.status === "complete") {
-			await signUp.finalize({
-				navigate: ({ decorateUrl, session }) => {
-					if (session?.currentTask?.key) {
-						const taskMap: Record<string, string> = {
-							"choose-organization": "/(tabs)/select-org",
-							"reset-password": "/(auth)/reset-password",
-							"setup-mfa": "/(auth)/mfa-setup",
-						};
-						const taskRoute = taskMap[session.currentTask.key] || "/(tabs)";
-						const url = decorateUrl(taskRoute);
-						router.replace(url as Href);
-					} else {
-						const url = decorateUrl("/(tabs)");
-						router.replace(url as Href);
-					}
-				},
+		try {
+			const { error: verifyError } = await signUp.verifications.verifyEmailCode({
+				code,
 			});
-		} else {
-			logger.error("Sign-up attempt not complete:", signUp);
-			setError("The code you entered is incorrect. Please double-check and try again.");
+
+			if (verifyError) {
+				logger.error("Verification Failed:", verifyError);
+				setError(verifyError.message || "The code you entered is incorrect.");
+				return;
+			}
+
+			if (signUp.status === "complete") {
+				await signUp.finalize({
+					navigate: ({ decorateUrl, session }) => {
+						if (session?.currentTask?.key) {
+							const taskMap: Record<string, string> = {
+								"choose-organization": "/(tabs)/select-org",
+								"reset-password": "/(auth)/reset-password",
+								"setup-mfa": "/(auth)/mfa-setup",
+							};
+							const taskRoute = taskMap[session.currentTask.key] || "/(auth)/task-recovery";
+							const url = decorateUrl(taskRoute);
+							router.replace(url as Href);
+						} else {
+							const url = decorateUrl("/(tabs)");
+							router.replace(url as Href);
+						}
+					},
+				});
+			} else {
+				logger.error("Sign-up attempt not complete:", signUp);
+				setError("The code you entered is incorrect. Please double-check and try again.");
+			}
+		} catch (e) {
+			logger.error("Verification Exception:", e);
+			setError("An unexpected error occurred during verification. Please try again.");
 		}
 	};
 
@@ -176,10 +186,15 @@ export default function SignUpScreen() {
 										className="auth-secondary-button mt-2"
 										onPress={async () => {
 											setError(null);
-											const { error: resendError } = await signUp.verifications.sendEmailCode();
-											if (resendError) {
-												logger.error("Resend Failed:", resendError);
-												setError(resendError.message || "Failed to resend code.");
+											try {
+												const { error: resendError } = await signUp.verifications.sendEmailCode();
+												if (resendError) {
+													logger.error("Resend Failed:", resendError);
+													setError(resendError.message || "Failed to resend code.");
+												}
+											} catch (e) {
+												logger.error("Resend Exception:", e);
+												setError("An unexpected error occurred while resending the code.");
 											}
 										}}
 										disabled={isLoading}
