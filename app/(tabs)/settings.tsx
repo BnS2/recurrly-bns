@@ -33,7 +33,7 @@ const Settings = () => {
 						<View className="flex-1">
 							<Text className="font-sans-bold text-xl text-primary">{user?.fullName || "Recurrly User"}</Text>
 							<Text className="font-sans-medium text-sm text-muted-foreground mt-1">
-								{user?.emailAddresses[0]?.emailAddress}
+								{user?.primaryEmailAddress?.emailAddress}
 							</Text>
 						</View>
 					</View>
@@ -47,7 +47,7 @@ const Settings = () => {
 					{isLoggingOut ? (
 						<ActivityIndicator color="#fff" />
 					) : (
-						<Text className="font-sans-bold text-base text-background">Logout</Text>
+						<Text className="auth-button-text">Logout</Text>
 					)}
 				</TouchableOpacity>
 			</ScrollView>

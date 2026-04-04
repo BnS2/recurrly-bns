@@ -7,11 +7,14 @@
 export const logger = {
 	error: (message: string, error?: unknown) => {
 		if (__DEV__) {
-			// Using console.log instead of console.error to avoid the full-screen 
-			// Red LogBox overlay in development interrupting UI testing.
-			console.log(`[🚨 ERROR] ${message}`, error ? JSON.stringify(error, null, 2) : "");
+			let errorDetails = "";
+			if (error instanceof Error) {
+				errorDetails = `\nName: ${error.name}\nMessage: ${error.message}\nStack: ${error.stack}`;
+			} else if (error) {
+				errorDetails = JSON.stringify(error, null, 2);
+			}
+			console.log(`[🚨 ERROR] ${message}${errorDetails}`);
 		}
-		// In production, we could send this to Sentry, Datadog, or Crashlytics here.
 	},
 	log: (message: string, data?: unknown) => {
 		if (__DEV__) {

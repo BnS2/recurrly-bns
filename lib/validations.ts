@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const signInSchema = z.object({
-	email: z.email("Please enter a valid email address."),
+	email: z.string().email("Please enter a valid email address."),
 	password: z.string().min(1, "Password cannot be empty."),
 });
 
@@ -10,5 +10,5 @@ export const signUpSchema = signInSchema.extend({
 });
 
 export const mfaSchema = z.object({
-	code: z.string().length(6, "Please enter a 6-digit code."),
+	code: z.string().regex(/^\d{6}$/, "Please enter a 6-digit numeric code."),
 });

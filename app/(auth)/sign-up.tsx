@@ -68,9 +68,14 @@ export default function SignUpScreen() {
 
 		if (signUp.status === "complete") {
 			await signUp.finalize({
-				navigate: ({ decorateUrl }) => {
-					const url = decorateUrl("/(tabs)");
-					router.replace(url as Href);
+				navigate: ({ decorateUrl, session }) => {
+					if (session?.currentTask) {
+						const url = decorateUrl(`/(tabs)?task=${session.currentTask}`);
+						router.replace(url as Href);
+					} else {
+						const url = decorateUrl("/(tabs)");
+						router.replace(url as Href);
+					}
 				},
 			});
 		} else {

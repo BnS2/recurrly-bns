@@ -63,9 +63,32 @@ export default function SignInScreen() {
 		if (!isCodeValid) return;
 
 		setError(null);
-		const { error: mfaError } = await signIn.mfa.verifyEmailCode({ code });
 
-		if (mfaError) {
+		const factor = signIn.supportedSecondFactors.find(
+			(f) =>
+				f.strategy === "email_code" ||
+				f.strategy === "phone_code" ||
+				f.strategy === "totp" ||
+				f.strategy === "backup_code",
+		);
+
+		if (!factor) {
+			setError("No supported verification method found.");
+			return;
+		}
+
+		let result: { error?: unknown } | undefined;
+		if (factor.strategy === "email_code") {
+			result = await signIn.mfa.verifyEmailCode({ code });
+		} else if (factor.strategy === "phone_code") {
+			result = await signIn.mfa.verifyPhoneCode({ code });
+		} else if (factor.strategy === "totp") {
+			result = await signIn.mfa.verifyTOTP({ code });
+		} else if (factor.strategy === "backup_code") {
+			result = await signIn.mfa.verifyBackupCode({ code });
+		}
+
+		if (result?.error) {
 			setError("The code you entered is incorrect. Please double-check and try again.");
 			return;
 		}
@@ -76,9 +99,16 @@ export default function SignInScreen() {
 	const handleSignInStatus = async () => {
 		if (signIn.status === "complete") {
 			await signIn.finalize({
-				navigate: ({ decorateUrl }) => {
-					const url = decorateUrl("/(tabs)");
-					router.replace(url as Href);
+				navigate: ({ decorateUrl, session }) => {
+					if (session?.currentTask) {
+						// Branch to specific task-handling routes if needed
+						// For now, we still use decorateUrl but prioritize the task-aware path
+						const url = decorateUrl(`/(tabs)?task=${session.currentTask}`);
+						router.replace(url as Href);
+					} else {
+						const url = decorateUrl("/(tabs)");
+						router.replace(url as Href);
+					}
 				},
 			});
 		} else if (signIn.status === "needs_second_factor" || signIn.status === "needs_client_trust") {
@@ -134,9 +164,9 @@ export default function SignInScreen() {
 											keyboardType="numeric"
 											maxLength={6}
 										/>
-										{(touched.code && !isCodeValid) ? (
+										{touched.code && !isCodeValid ? (
 											<Text className="auth-error text-center">{codeErrorMsg}</Text>
-										) : (error || errors.fields.code) ? (
+										) : error || errors.fields.code ? (
 											<Text className="auth-error text-center">{error || errors.fields.code?.message}</Text>
 										) : null}
 									</View>
@@ -156,7 +186,10 @@ export default function SignInScreen() {
 
 									<TouchableOpacity
 										className="auth-secondary-button mt-2"
-										onPress={() => signIn.reset()}
+										onPress={() => {
+											signIn.reset();
+											setIsVerifyingMfa(false);
+										}}
 										disabled={isLoading}
 									>
 										<Text className="auth-secondary-button-text">Go back</Text>
@@ -206,7 +239,7 @@ export default function SignInScreen() {
 										onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
 										keyboardType="email-address"
 									/>
-									{(touched.email && !isEmailValid) ? (
+									{touched.email && !isEmailValid ? (
 										<Text className="auth-error">{emailErrorMsg}</Text>
 									) : errors.fields.identifier ? (
 										<Text className="auth-error">{errors.fields.identifier.message}</Text>
@@ -224,7 +257,7 @@ export default function SignInScreen() {
 										onChangeText={setPassword}
 										onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
 									/>
-									{(touched.password && !isPasswordValid) ? (
+									{touched.password && !isPasswordValid ? (
 										<Text className="auth-error">{passwordErrorMsg}</Text>
 									) : errors.fields.password ? (
 										<Text className="auth-error">{errors.fields.password.message}</Text>

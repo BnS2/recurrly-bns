@@ -22,7 +22,7 @@ function HomeListHeader() {
 				<View className="home-user">
 					<Image source={user?.imageUrl ? { uri: user.imageUrl } : images.avatar} className="home-avatar" />
 					<Text className="home-user-name">
-						{user?.firstName || user?.emailAddresses[0].emailAddress.split("@")[0] || "User"}
+						{user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split("@")?.[0] || "User"}
 					</Text>
 				</View>
 
