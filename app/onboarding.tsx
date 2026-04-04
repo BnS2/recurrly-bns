@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-const onboarding = () => {
+const Onboarding = () => {
 	return (
 		<View>
 			<Text>onboarding</Text>
@@ -8,4 +8,4 @@ const onboarding = () => {
 	);
 };
 
-export default onboarding;
+export default Onboarding;

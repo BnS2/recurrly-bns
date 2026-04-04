@@ -9,8 +9,10 @@
 		"ios": "expo start --ios --port 8082",
 		"web": "expo start --web --port 8082",
 		"lint": "biome lint . && eslint .",
-		"format": "biome format . --write",
-		"check": "biome check --write . && eslint . --fix"
+		"format": "biome format .",
+		"format:fix": "biome format . --write",
+		"check": "biome check . && eslint .",
+		"fix": "biome check --write . && eslint . --fix"
 	},
 	"dependencies": {
 		"@expo/vector-icons": "^15.0.3",

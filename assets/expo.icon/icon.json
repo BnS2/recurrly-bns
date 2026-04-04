@@ -6,15 +6,15 @@
     {
       "layers": [
         {
-          "image-name": "expo-symbol 2.svg",
+          "image-name": "Assets/expo-symbol 2.svg",
           "name": "expo-symbol 2",
           "position": {
             "scale": 1,
-            "translation-in-points": [1.1008400065293245e-5, -16.046875]
+            "translation-in-points": [0, -16.046875]
           }
         },
         {
-          "image-name": "grid.png",
+          "image-name": "Assets/grid.png",
           "name": "grid"
         }
       ],
