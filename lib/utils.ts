@@ -4,8 +4,8 @@ export function formatCurrency(value: unknown, currency: string = "USD"): string
 	try {
 		const numericValue = typeof value === "string" ? parseFloat(value) : Number(value);
 
-		if (Number.isNaN(numericValue) || typeof numericValue !== "number") {
-			return "$0.00";
+		if (Number.isNaN(numericValue)) {
+			return formatZero(currency);
 		}
 
 		return new Intl.NumberFormat("en-US", {
@@ -21,6 +21,19 @@ export function formatCurrency(value: unknown, currency: string = "USD"): string
 			console.error("Unknown currency formatting error", error);
 		}
 		// Fallback if Intl.NumberFormat fails or any other error
+		return formatZero(currency);
+	}
+}
+
+function formatZero(currency: string): string {
+	try {
+		return new Intl.NumberFormat(undefined, {
+			style: "currency",
+			currency: currency,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2,
+		}).format(0);
+	} catch {
 		return "$0.00";
 	}
 }

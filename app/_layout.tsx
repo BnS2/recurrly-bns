@@ -8,7 +8,7 @@ export const unstable_settings = {
 };
 
 export default function RootLayout() {
-	const [fontsLoaded] = useFonts({
+	const [fontsLoaded, fontsError] = useFonts({
 		"sans-regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
 		"sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
 		"sans-medium": require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
@@ -18,12 +18,15 @@ export default function RootLayout() {
 	});
 
 	useEffect(() => {
-		if (fontsLoaded) {
+		if (fontsLoaded || fontsError) {
+			if (fontsError) {
+				console.error("Failed to load fonts:", fontsError);
+			}
 			SplashScreen.hideAsync();
 		}
-	}, [fontsLoaded]);
+	}, [fontsLoaded, fontsError]);
 
-	if (!fontsLoaded) {
+	if (!fontsLoaded && !fontsError) {
 		return null;
 	}
 

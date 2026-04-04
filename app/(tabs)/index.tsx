@@ -47,7 +47,7 @@ export default function App() {
 								ListEmptyComponent={<Text className="home-empty-state">No upcoming renewals yet.</Text>}
 							/>
 						</View>
-						<ListHeading title="All Subscription" />
+						<ListHeading title="All Subscriptions" />
 					</>
 				)}
 				data={HOME_SUBSCRIPTIONS}
