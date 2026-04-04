@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { logger } from "./logger";
 
 export function formatCurrency(value: unknown, currency: string = "USD"): string {
 	try {
@@ -16,9 +17,9 @@ export function formatCurrency(value: unknown, currency: string = "USD"): string
 		}).format(numericValue);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			console.error(`Currency formatting error: ${error.message}`);
+			logger.error(`Currency formatting error: ${error.message}`);
 		} else {
-			console.error("Unknown currency formatting error", error);
+			logger.error("Unknown currency formatting error", error);
 		}
 		// Fallback if Intl.NumberFormat fails or any other error
 		return formatZero(currency);

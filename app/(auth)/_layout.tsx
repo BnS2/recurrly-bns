@@ -1,11 +1,21 @@
-import { Stack } from "expo-router";
+import { useAuth } from "@clerk/expo";
+import { Redirect, Stack } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
-// TODO: Auth routing is currently scaffolded.
-// Before shipping, the root layout (_layout.tsx) should perform an auth-state
-// check (e.g. a hook that reads currentUser/isAuthenticated) and
-// conditionally redirect unauthenticated users here via
-// router.replace("/(auth)/sign-in") instead of always initialising on "(tabs)".
-// Reference: unstable_settings.initialRouteName in app/_layout.tsx.
 export default function AuthLayout() {
+	const { isSignedIn, isLoaded } = useAuth();
+
+	if (!isLoaded) {
+		return (
+			<View className="flex-1 items-center justify-center bg-background">
+				<ActivityIndicator size="large" color="#FF6F3B" />
+			</View>
+		);
+	}
+
+	if (isSignedIn) {
+		return <Redirect href={"/(tabs)"} />;
+	}
+
 	return <Stack screenOptions={{ headerShown: false }} />;
 }

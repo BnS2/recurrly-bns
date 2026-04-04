@@ -1,7 +1,18 @@
 import "@/global.css";
+import { ClerkProvider } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
+	// Removed manual tokenCache as we are now using @clerk/expo/token-cache
 import { useEffect } from "react";
+import { logger } from "@/lib/logger";
+
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+
+if (!publishableKey) {
+	logger.error("Add your Clerk Publishable Key (EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY) to the .env.local file");
+}
 
 export const unstable_settings = {
 	initialRouteName: "(tabs)",
@@ -20,7 +31,7 @@ export default function RootLayout() {
 	useEffect(() => {
 		if (fontsLoaded || fontsError) {
 			if (fontsError) {
-				console.error("Failed to load fonts:", fontsError);
+				logger.error("Failed to load fonts:", fontsError);
 			}
 			SplashScreen.hideAsync();
 		}
@@ -30,5 +41,9 @@ export default function RootLayout() {
 		return null;
 	}
 
-	return <Stack screenOptions={{ headerShown: false }} />;
+	return (
+		<ClerkProvider publishableKey={publishableKey as string} tokenCache={tokenCache}>
+			<Stack screenOptions={{ headerShown: false }} />
+		</ClerkProvider>
+	);
 }
