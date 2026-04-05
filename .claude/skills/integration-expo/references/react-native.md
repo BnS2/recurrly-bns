@@ -574,7 +574,7 @@ If you are doing this as part of a user logging out you can instead simply [`pos
 
 You can completely opt-out users from data capture. To do this, there are two options:
 
-1.  Opt users out by default by setting `opt_out_capturing_by_default` to `true` in your PostHog config:
+1.  Opt users out by default by setting `defaultOptIn` to `false` in your PostHog config:
 
 JavaScript
 
@@ -582,18 +582,18 @@ PostHog AI
 
 ```javascript
 posthog.init('<ph_project_token>', {
-    opt_out_capturing_by_default: true,
+    defaultOptIn: false,
 });
 ```
 
-2.  Opt users out on a per-person basis by calling `opt_out_capturing()`:
+2.  Opt users out on a per-person basis by calling `optOut()`:
 
 JavaScript
 
 PostHog AI
 
 ```javascript
-posthog.opt_out_capturing()
+posthog.optOut()
 ```
 
 Similarly, you can opt users in:
@@ -603,7 +603,7 @@ JavaScript
 PostHog AI
 
 ```javascript
-posthog.opt_in_capturing()
+posthog.optIn()
 ```
 
 To check if a user is opted out:
@@ -613,7 +613,7 @@ JavaScript
 PostHog AI
 
 ```javascript
-posthog.has_opted_out_capturing()
+posthog.optedOut
 ```
 
 ## Flush
@@ -710,6 +710,7 @@ PostHog AI
 
 ```jsx
 import { useFeatureFlag } from 'posthog-react-native'
+import { View } from 'react-native'
 const MyComponent = () => {
     const multiVariantFeature = useFeatureFlag('key-for-your-multivariate-flag')
     if (multiVariantFeature === undefined) {
@@ -719,7 +720,7 @@ const MyComponent = () => {
       // Do something
     }
     // Optional use the 'useFeatureFlagWithPayload' hook for fetching the feature flag payload
-    return <div/>
+    return <View />
 }
 ```
 
@@ -1125,7 +1126,7 @@ posthog.debug()
 
 ## Disabling for local development
 
-You may want to disable PostHog when working locally or in a test environment. You can do this by setting the `disable` option to `true` when initializing PostHog. Helpfully this allows you to continue using `usePostHog` and safely calling it without anything actually happening.
+You may want to disable PostHog when working locally or in a test environment. You can do this by setting the `disabled` option to `true` when initializing PostHog. Helpfully this allows you to continue using `usePostHog` and safely calling it without anything actually happening.
 
 React Native
 
