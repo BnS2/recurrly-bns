@@ -40,7 +40,7 @@ const Settings = () => {
 					<View className="flex-row items-center gap-4">
 						<Image source={user?.imageUrl ? { uri: user.imageUrl } : images.avatar} className="size-16 rounded-full" />
 						<View className="flex-1">
-							<Text className="font-sans-bold text-xl text-primary">{user?.fullName || "Recurrly User"}</Text>
+							<Text className="font-sans-bold text-xl text-primary">{user?.fullName || user?.firstName || user?.primaryEmailAddress?.emailAddress?.split("@")?.[0] || "User"}</Text>
 							<Text className="font-sans-medium text-sm text-muted-foreground mt-1">
 								{user?.primaryEmailAddress?.emailAddress}
 							</Text>
