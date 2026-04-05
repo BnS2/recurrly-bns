@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { usePostHog } from "posthog-react-native";
+import { useEffect, useRef, useState } from "react";
 import {
 	ActivityIndicator,
 	Image,
@@ -72,11 +73,8 @@ function getAppIcon(name: string) {
 	return icons.wallet;
 }
 
-export default function CreateSubscriptionModal({
-	visible,
-	onClose,
-	onAdd,
-}: CreateSubscriptionModalProps) {
+export default function CreateSubscriptionModal({ visible, onClose, onAdd }: CreateSubscriptionModalProps) {
+	const posthog = usePostHog();
 	const [name, setName] = useState("");
 	const [price, setPrice] = useState("");
 	const [frequency, setFrequency] = useState<"Monthly" | "Yearly">("Monthly");
@@ -84,6 +82,16 @@ export default function CreateSubscriptionModal({
 
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [touched, setTouched] = useState({ name: false, price: false });
+	const submitTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// Cleanup timeout on unmount
+	useEffect(() => {
+		return () => {
+			if (submitTimeoutRef.current) {
+				clearTimeout(submitTimeoutRef.current);
+			}
+		};
+	}, []);
 
 	const validation = subscriptionSchema.safeParse({
 		name,
@@ -127,15 +135,27 @@ export default function CreateSubscriptionModal({
 			currency: "USD",
 		};
 
+		posthog.capture("subscription_created", {
+			subscription_name: validatedName,
+			subscription_price: priceValue,
+			subscription_frequency: validatedBilling,
+			subscription_category: validatedCategory,
+		});
+
 		// Brief delay for UX feedback
-		setTimeout(() => {
+		submitTimeoutRef.current = setTimeout(() => {
 			onAdd(newSubscription);
 			handleClose();
 			setIsSubmitting(false);
+			submitTimeoutRef.current = null;
 		}, 600);
 	};
 
 	const handleClose = () => {
+		if (submitTimeoutRef.current) {
+			clearTimeout(submitTimeoutRef.current);
+			submitTimeoutRef.current = null;
+		}
 		setName("");
 		setPrice("");
 		setFrequency("Monthly");
@@ -148,10 +168,7 @@ export default function CreateSubscriptionModal({
 		<Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
 			<View className="modal-overlay">
 				<Pressable className="flex-1" onPress={handleClose} />
-				<KeyboardAvoidingView
-					behavior={Platform.OS === "ios" ? "padding" : "height"}
-					className="modal-container"
-				>
+				<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} className="modal-container">
 					<View className="modal-header">
 						<Text className="modal-title">New Subscription</Text>
 						<Pressable
@@ -179,12 +196,10 @@ export default function CreateSubscriptionModal({
 								placeholder="Netflix, Spotify, etc."
 								value={name}
 								onChangeText={setName}
-								onBlur={() => setTouched({ ...touched, name: true })}
+								onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
 								placeholderTextColor="rgba(8, 17, 38, 0.4)"
 							/>
-							{getFieldError("name") && (
-								<Text className="auth-error mb-2">{getFieldError("name")}</Text>
-							)}
+							{getFieldError("name") && <Text className="auth-error mb-2">{getFieldError("name")}</Text>}
 						</View>
 
 						<View className="auth-field mt-4">
@@ -195,12 +210,10 @@ export default function CreateSubscriptionModal({
 								keyboardType="decimal-pad"
 								value={price}
 								onChangeText={setPrice}
-								onBlur={() => setTouched({ ...touched, price: true })}
+								onBlur={() => setTouched((prev) => ({ ...prev, price: true }))}
 								placeholderTextColor="rgba(8, 17, 38, 0.4)"
 							/>
-							{getFieldError("price") && (
-								<Text className="auth-error mb-2">{getFieldError("price")}</Text>
-							)}
+							{getFieldError("price") && <Text className="auth-error mb-2">{getFieldError("price")}</Text>}
 						</View>
 
 						<View className="auth-field mt-4">
@@ -210,12 +223,7 @@ export default function CreateSubscriptionModal({
 									onPress={() => setFrequency("Monthly")}
 									className={clsx("picker-option", frequency === "Monthly" && "picker-option-active")}
 								>
-									<Text
-										className={clsx(
-											"picker-option-text",
-											frequency === "Monthly" && "picker-option-text-active",
-										)}
-									>
+									<Text className={clsx("picker-option-text", frequency === "Monthly" && "picker-option-text-active")}>
 										Monthly
 									</Text>
 								</Pressable>
@@ -223,12 +231,7 @@ export default function CreateSubscriptionModal({
 									onPress={() => setFrequency("Yearly")}
 									className={clsx("picker-option", frequency === "Yearly" && "picker-option-active")}
 								>
-									<Text
-										className={clsx(
-											"picker-option-text",
-											frequency === "Yearly" && "picker-option-text-active",
-										)}
-									>
+									<Text className={clsx("picker-option-text", frequency === "Yearly" && "picker-option-text-active")}>
 										Yearly
 									</Text>
 								</Pressable>
@@ -244,12 +247,7 @@ export default function CreateSubscriptionModal({
 										onPress={() => setCategory(cat)}
 										className={clsx("category-chip", category === cat && "category-chip-active")}
 									>
-										<Text
-											className={clsx(
-												"category-chip-text",
-												category === cat && "category-chip-text-active",
-											)}
-										>
+										<Text className={clsx("category-chip-text", category === cat && "category-chip-text-active")}>
 											{cat}
 										</Text>
 									</Pressable>
@@ -263,10 +261,7 @@ export default function CreateSubscriptionModal({
 							style={({ pressed }) => ({
 								opacity: pressed || isSubmitting ? 0.7 : 1,
 							})}
-							className={clsx(
-								"auth-button mt-10 mb-10",
-								(!isValid || isSubmitting) && "auth-button-disabled",
-							)}
+							className={clsx("auth-button mt-10 mb-10", (!isValid || isSubmitting) && "auth-button-disabled")}
 						>
 							{isSubmitting ? (
 								<ActivityIndicator color="#081126" />

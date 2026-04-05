@@ -15,14 +15,14 @@ const Subscriptions = () => {
 	const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
 
 	const filteredSubscriptions = useMemo(() => {
-		if (!searchQuery) return subscriptions;
+		const normalizedQuery = searchQuery?.trim().toLowerCase();
+		if (!normalizedQuery) return subscriptions;
 
 		return subscriptions.filter((sub) => {
-			const query = searchQuery.toLowerCase();
 			return (
-				sub.name.toLowerCase().includes(query) ||
-				sub.category?.toLowerCase().includes(query) ||
-				sub.plan?.toLowerCase().includes(query)
+				sub.name.toLowerCase().includes(normalizedQuery) ||
+				sub.category?.toLowerCase().includes(normalizedQuery) ||
+				sub.plan?.toLowerCase().includes(normalizedQuery)
 			);
 		});
 	}, [searchQuery, subscriptions]);
