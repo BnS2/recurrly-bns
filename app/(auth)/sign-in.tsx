@@ -1,5 +1,6 @@
 import { useSignIn } from "@clerk/expo";
 import { type Href, Link, useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useState } from "react";
 import {
 	ActivityIndicator,
@@ -23,6 +24,7 @@ type SignInSecondFactor = {
 export default function SignInScreen() {
 	const { signIn, errors, fetchStatus } = useSignIn();
 	const router = useRouter();
+	const posthog = usePostHog();
 
 	const [emailAddress, setEmailAddress] = useState("");
 	const [password, setPassword] = useState("");
@@ -40,9 +42,7 @@ export default function SignInScreen() {
 	const passwordErrorMsg = passwordParse.success ? "" : passwordParse.error.issues[0].message;
 
 	const isBackupCode = selectedFactor?.strategy === "backup_code";
-	const codeParse = isBackupCode
-		? backupCodeSchema.shape.code.safeParse(code)
-		: mfaSchema.shape.code.safeParse(code);
+	const codeParse = isBackupCode ? backupCodeSchema.shape.code.safeParse(code) : mfaSchema.shape.code.safeParse(code);
 	const isCodeValid = codeParse.success;
 	const codeErrorMsg = codeParse.success ? "" : codeParse.error.issues[0].message;
 
@@ -59,7 +59,8 @@ export default function SignInScreen() {
 
 			if (signInError) {
 				logger.error("Sign In Failed:", signInError);
-				setError(signInError.message || "Something went wrong. Please try again.");
+				posthog.capture("sign_in_failed", { error_code: signInError.code });
+				setError("Something went wrong. Please try again.");
 				return;
 			}
 
@@ -97,6 +98,7 @@ export default function SignInScreen() {
 			}
 
 			if (result?.error) {
+				posthog.capture("mfa_verification_failed", { mfa_strategy: selectedFactor.strategy });
 				setError("The code you entered is incorrect. Please double-check and try again.");
 				return;
 			}
@@ -113,6 +115,11 @@ export default function SignInScreen() {
 			if (signIn.status === "complete") {
 				await signIn.finalize({
 					navigate: ({ decorateUrl, session }) => {
+						posthog.identify(session?.user?.id ?? emailAddress, {
+							$set: { email: emailAddress },
+							$set_once: { first_sign_in_date: new Date().toISOString() },
+						});
+						posthog.capture("user_signed_in", { method: "password" });
 						if (session?.currentTask?.key) {
 							// Map Clerk task keys to our routes or use a parameterized approach
 							const taskMap: Record<string, string> = {
@@ -139,6 +146,7 @@ export default function SignInScreen() {
 				);
 
 				if (factor) {
+					posthog.capture("mfa_verification_started", { mfa_strategy: factor.strategy });
 					setSelectedFactor(factor);
 					if (factor.strategy === "email_code") {
 						const { error } = await signIn.mfa.sendEmailCode();

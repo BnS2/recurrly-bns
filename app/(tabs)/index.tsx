@@ -1,5 +1,6 @@
 import { useUser } from "@clerk/expo";
 import dayjs from "dayjs";
+import { usePostHog } from "posthog-react-native";
 import { useCallback, useState } from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import ListHeading from "@/components/ListHeading";
@@ -55,11 +56,18 @@ function HomeListHeader() {
 }
 
 export default function App() {
+	const posthog = usePostHog();
 	const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
 
 	const handleSubscriptionPress = useCallback(
-		(id: string) => setExpandedSubscriptionId((currentId) => (currentId === id ? null : id)),
-		[],
+		(id: string) => {
+			const isExpanding = expandedSubscriptionId !== id;
+			posthog.capture(isExpanding ? "subscription_expanded" : "subscription_collapsed", {
+				subscription_id: id,
+			});
+			setExpandedSubscriptionId(isExpanding ? id : null);
+		},
+		[expandedSubscriptionId, posthog],
 	);
 
 	return (
