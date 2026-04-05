@@ -16,7 +16,7 @@ PostHog AI
 npx expo install posthog-react-native expo-file-system expo-application expo-device expo-localization
 ```
 
-#### React Native apps
+### React Native apps
 
 Terminal
 
@@ -28,7 +28,7 @@ yarn add posthog-react-native @react-native-async-storage/async-storage react-na
 npm i -s posthog-react-native @react-native-async-storage/async-storage react-native-device-info react-native-localize
 ```
 
-#### React Native Web and macOS
+### React Native Web and macOS
 
 If you're using [React Native Web](https://github.com/necolas/react-native-web) or [React Native macOS](https://github.com/microsoft/react-native-macos), do not use the [expo-file-system](https://github.com/expo/expo/tree/master/packages/expo-file-system) package since the Web and macOS targets aren't supported, use the [@react-native-async-storage/async-storage](https://github.com/react-native-async-storage/async-storage) package instead.
 
