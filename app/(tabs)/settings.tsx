@@ -16,6 +16,7 @@ const Settings = () => {
 		setIsLoggingOut(true);
 		try {
 			posthog.capture("user_signed_out");
+			await posthog.flush();
 			posthog.reset();
 			await signOut();
 		} catch (error) {

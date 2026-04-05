@@ -1,6 +1,6 @@
 /**
  * A simple logger utility for React Native.
- * 
+ *
  * In React Native, `__DEV__` is a global boolean injected by the Metro bundler.
  * It is automatically true in development (like Expo Go) and false in production builds.
  */

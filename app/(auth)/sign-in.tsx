@@ -59,8 +59,8 @@ export default function SignInScreen() {
 
 			if (signInError) {
 				logger.error("Sign In Failed:", signInError);
-				posthog.capture("sign_in_failed", { error_message: signInError.message });
-				setError(signInError.message || "Something went wrong. Please try again.");
+				posthog.capture("sign_in_failed", { error_code: signInError.code });
+				setError("Something went wrong. Please try again.");
 				return;
 			}
 
@@ -115,7 +115,7 @@ export default function SignInScreen() {
 			if (signIn.status === "complete") {
 				await signIn.finalize({
 					navigate: ({ decorateUrl, session }) => {
-						posthog.identify(session?.id ?? emailAddress, {
+						posthog.identify(session?.user?.id ?? emailAddress, {
 							$set: { email: emailAddress },
 							$set_once: { first_sign_in_date: new Date().toISOString() },
 						});

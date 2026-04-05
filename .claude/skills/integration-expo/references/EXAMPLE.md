@@ -24,7 +24,7 @@ A React Native Expo app demonstrating PostHog product analytics integration with
 
 ## Project Structure
 
-```
+```text
 basics/expo/
 ├── app/                          # Expo Router screens (file-based routing)
 │   ├── _layout.tsx               # Root layout with PostHogProvider + AuthProvider
@@ -248,9 +248,8 @@ POSTHOG_HOST=https://us.i.posthog.com
 
 ## .npmrc
 
-```
+```ini
 legacy-peer-deps=true
-
 ```
 
 ---
@@ -327,10 +326,21 @@ export default function RootLayout() {
   // React Compiler will auto-optimize this effect
   useEffect(() => {
     if (previousPathname.current !== pathname) {
-      posthog.screen(pathname, {
+      // Construct a canonical route name (e.g., /subscriptions/123 -> /subscriptions/[id])
+      const canonicalRoute = pathname.replace(/\/subscriptions\/\d+/, '/subscriptions/[id]')
+
+      // Filter sensitive/high-cardinality data from params
+      const allowlist = ['utm_source', 'utm_medium', 'utm_campaign', 'campaign_id']
+      const allowlistedParams = Object.keys(params)
+        .filter((key) => allowlist.includes(key))
+        .reduce((obj, key) => {
+          obj[key] = params[key]
+          return obj
+        }, {} as Record<string, any>)
+
+      posthog.screen(canonicalRoute, {
         previous_screen: previousPathname.current ?? null,
-        // Include route params for analytics (filter sensitive data if needed)
-        ...params,
+        ...allowlistedParams,
       })
       previousPathname.current = pathname
     }

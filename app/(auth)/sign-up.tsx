@@ -53,8 +53,8 @@ export default function SignUpScreen() {
 
 			if (signUpError) {
 				logger.error("Sign Up Failed:", signUpError);
-				posthog.capture("sign_up_failed", { error_message: signUpError.message });
-				setError(signUpError.message || "Failed to create account. Please try again.");
+				posthog.capture("sign_up_failed", { error_code: signUpError.code });
+				setError("Something went wrong. Please try again.");
 				return;
 			}
 
@@ -89,7 +89,7 @@ export default function SignUpScreen() {
 			if (signUp.status === "complete") {
 				await signUp.finalize({
 					navigate: ({ decorateUrl, session }) => {
-						posthog.identify(session?.id ?? emailAddress, {
+						posthog.identify(session?.user?.id ?? emailAddress, {
 							$set: { email: emailAddress },
 							$set_once: { sign_up_date: new Date().toISOString() },
 						});

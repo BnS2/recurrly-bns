@@ -61,15 +61,13 @@ export default function App() {
 
 	const handleSubscriptionPress = useCallback(
 		(id: string) => {
-			setExpandedSubscriptionId((currentId) => {
-				const isExpanding = currentId !== id;
-				posthog.capture(isExpanding ? "subscription_expanded" : "subscription_collapsed", {
-					subscription_id: id,
-				});
-				return isExpanding ? id : null;
+			const isExpanding = expandedSubscriptionId !== id;
+			posthog.capture(isExpanding ? "subscription_expanded" : "subscription_collapsed", {
+				subscription_id: id,
 			});
+			setExpandedSubscriptionId(isExpanding ? id : null);
 		},
-		[posthog],
+		[expandedSubscriptionId, posthog],
 	);
 
 	return (

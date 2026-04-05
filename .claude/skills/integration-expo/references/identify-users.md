@@ -8,7 +8,7 @@ However, in the frontend of a [web](/docs/libraries/js/features.md#capturing-eve
 
 To link events to specific users, call `identify`:
 
-PostHog AI
+## Platforms
 
 ### Web
 
@@ -112,8 +112,6 @@ This is important if your users are sharing a computer, as otherwise all of thos
 
 You can do that like so:
 
-PostHog AI
-
 ### Web
 
 ```javascript
@@ -146,9 +144,7 @@ Posthog().reset()
 
 If you *also* want to reset the `device_id` so that the device will be considered a new device in future events, you can pass `true` as an argument:
 
-Web
-
-PostHog AI
+Web — JavaScript
 
 ```javascript
 posthog.reset(true)
@@ -162,13 +158,13 @@ This enables you to set [person properties](/docs/product-analytics/person-prope
 
 Whenever possible, we recommend passing in all person properties you have available each time you call identify, as this ensures their person profile on PostHog is up to date.
 
-Person properties can also be set being adding a `$set` property to a event `capture` call.
+Person properties can also be set by adding a `$set` property to a event `capture` call.
 
 See our [person properties docs](/docs/product-analytics/person-properties.md) for more details on how to work with them and best practices.
 
 ### 5\. Use deep links between platforms
 
-We recommend you call `identify` [as soon as you're able](#1-call-identify-as-soon-as-youre-able), typically when a user signs up or logs in.
+We recommend you call `identify` [as soon as you're able](#1-call-identify-as-soon-as-youre-able-to), typically when a user signs up or logs in.
 
 This doesn't work if one or both platforms are unauthenticated. Some examples of such cases are:
 

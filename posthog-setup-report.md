@@ -32,12 +32,12 @@ The wizard has completed a deep integration of PostHog analytics into your Recur
 
 We've built some insights and a dashboard for you to keep an eye on user behavior, based on the events we just instrumented:
 
-- **Dashboard — Analytics basics**: https://us.posthog.com/project/369822/dashboard/1432406
-- **Sign-up conversion funnel** (sign-up → subscription engagement): https://us.posthog.com/project/369822/insights/y4raCnP8
-- **Sign-in: success vs failure** (daily trend): https://us.posthog.com/project/369822/insights/DtFF7gpF
-- **Sign-up: success vs failure** (daily trend): https://us.posthog.com/project/369822/insights/rq6D5OLX
-- **User churn: sign-outs over time**: https://us.posthog.com/project/369822/insights/lx5IAsfC
-- **Return user funnel** (sign-in → subscription engagement): https://us.posthog.com/project/369822/insights/ko0A5oqX
+- **Dashboard — Analytics basics**: <POSTHOG_DASHBOARD_URL>
+- **Sign-up conversion funnel** (sign-up → subscription engagement): <POSTHOG_INSIGHT_URL>
+- **Sign-in: success vs failure** (daily trend): <POSTHOG_INSIGHT_URL>
+- **Sign-up: success vs failure** (daily trend): <POSTHOG_INSIGHT_URL>
+- **User churn: sign-outs over time**: <POSTHOG_INSIGHT_URL>
+- **Return user funnel** (sign-in → subscription engagement): <POSTHOG_INSIGHT_URL>
 
 ### Agent skill
 

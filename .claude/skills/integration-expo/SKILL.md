@@ -39,14 +39,12 @@ The example project shows the target implementation pattern. Consult the documen
 
 ## Framework guidelines
 
-- posthog-react-native is the React Native SDK package name (same as bare RN)
-- Use expo-constants with app.config.js extras for POSTHOG_PROJECT_TOKEN and POSTHOG_HOST (NOT react-native-config)
-- Access config via `Constants.expoConfig?.extra?.posthogProjectToken` in your posthog.ts config file
-- For expo-router, wrap PostHogProvider in app/_layout.tsx and manually track screens with `posthog.screen(pathname, params)` in a useEffect
-- posthog-react-native is the React Native SDK package name
-- Use react-native-config to load POSTHOG_PROJECT_TOKEN and POSTHOG_HOST from .env (variables are embedded at build time, not runtime)
-- react-native-svg is a required peer dependency of posthog-react-native (used by the surveys feature) and must be installed alongside it
-- Place PostHogProvider INSIDE NavigationContainer for React Navigation v7 compatibility
+- **Environment Setup**: Use `expo-constants` with `app.config.js` to expose `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST` from `.env`. Access them via `Constants.expoConfig?.extra?.posthogProjectToken` in your `posthog.ts` configuration.
+- **Routing & Tracking**:
+    - **Expo Router**: Wrap the entire app in `PostHogProvider` within `app/_layout.tsx`. Manually track screens by calling `posthog.screen(pathname, params)` inside a `useEffect` that listens to `pathname`.
+    - **React Navigation (v7+)**: The `PostHogProvider` **must** be placed **INSIDE** the `NavigationContainer` to ensure navigation hooks function correctly.
+- **Dependencies**: `posthog-react-native` is the core package. For Expo, ensure peer dependencies like `expo-file-system`, `expo-application`, `expo-device`, and `expo-localization` are installed via `npx expo install`.
+- **UI Elements**: `react-native-svg` is a required peer dependency (used by the surveys feature) and must be installed separately.
 
 ## Identifying users
 
