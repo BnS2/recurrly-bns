@@ -10,6 +10,11 @@ export const colors = {
 	success: "#16a34a",
 	destructive: "#dc2626",
 	subscription: "#8fd1bd",
+	chartAccent: "#d4593a",
+	chartBackground: "rgba(236, 226, 194, 0.55)",
+	chartBorder: "rgba(0, 0, 0, 0.06)",
+	chartGridLine: "rgba(0, 0, 0, 0.08)",
+	chartStroke: "rgba(0, 0, 0, 0.12)",
 } as const;
 
 export const spacing = {
