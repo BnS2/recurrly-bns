@@ -5,6 +5,7 @@ import MonthlyBarChart from "@/components/MonthlyBarChart";
 import SafeAreaView from "@/components/StyledSafeAreaView";
 import SubscriptionCard from "@/components/SubscriptionCard";
 import { icons } from "@/constants/icons";
+import { colors } from "@/constants/theme";
 import { useSubscriptionContext } from "@/context/SubscriptionContext";
 
 const Insights = () => {
@@ -16,7 +17,7 @@ const Insights = () => {
 			<View className="flex-row justify-between items-center my-5 px-5">
 				<Text className="text-primary text-2xl font-sans-bold">Monthly Insights</Text>
 				<TouchableOpacity className="w-10 h-10 bg-background rounded-full items-center justify-center border border-border/10">
-					<Image source={icons.menu} className="w-5 h-5" style={{ tintColor: "#081126" }} />
+					<Image source={icons.menu} className="w-5 h-5" style={{ tintColor: colors.primary }} />
 				</TouchableOpacity>
 			</View>
 

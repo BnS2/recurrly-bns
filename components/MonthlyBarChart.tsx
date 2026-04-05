@@ -1,9 +1,7 @@
 import React from "react";
-import { Dimensions, View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import Svg, { Defs, Line, LinearGradient, Path, Rect, Stop, Text as SvgText } from "react-native-svg";
 import { colors } from "@/constants/theme";
-
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface DataPoint {
 	day: string;
@@ -11,7 +9,7 @@ interface DataPoint {
 	isHighlighted?: boolean;
 }
 
-const data: DataPoint[] = [
+const defaultData: DataPoint[] = [
 	{ day: "Mon", value: 35 },
 	{ day: "Tue", value: 30 },
 	{ day: "Wed", value: 20 },
@@ -21,24 +19,31 @@ const data: DataPoint[] = [
 	{ day: "Sun", value: 22 },
 ];
 
-const CHART_HEIGHT = 200;
-const CHART_PADDING_TOP = 44;
-const CHART_PADDING_LEFT = 30;
-const BAR_WIDTH = 16;
-const MAX_VALUE = 45;
+interface MonthlyBarChartProps {
+	data?: DataPoint[];
+}
 
-const MonthlyBarChart = () => {
-	const chartWidth = SCREEN_WIDTH - 80;
+const MonthlyBarChart = ({ data }: MonthlyBarChartProps) => {
+	const { width: screenWidth } = useWindowDimensions();
+	const chartData = data ?? defaultData;
+
+	const CHART_HEIGHT = 200;
+	const CHART_PADDING_TOP = 44;
+	const CHART_PADDING_LEFT = 30;
+	const BAR_WIDTH = 16;
+	const MAX_VALUE = 45;
+
+	const chartWidth = screenWidth - 80;
 	const drawableWidth = chartWidth - CHART_PADDING_LEFT;
-	const gap = (drawableWidth - data.length * BAR_WIDTH) / (data.length - 1);
+	const gap = chartData.length > 1 ? (drawableWidth - chartData.length * BAR_WIDTH) / (chartData.length - 1) : 0;
 
 	return (
 		<View
 			className="p-5 rounded-3xl mt-4"
 			style={{
-				backgroundColor: "rgba(236, 226, 194, 0.55)",
+				backgroundColor: colors.chartBackground,
 				borderWidth: 1,
-				borderColor: "rgba(0,0,0,0.06)",
+				borderColor: colors.chartBorder,
 			}}
 		>
 			<View style={{ height: CHART_HEIGHT + 44 }}>
@@ -52,7 +57,7 @@ const MonthlyBarChart = () => {
 						{/* Gradient for highlighted bar */}
 						<LinearGradient id="accentGrad" x1="0" y1="0" x2="0" y2="1">
 							<Stop offset="0" stopColor={colors.accent} stopOpacity="1" />
-							<Stop offset="1" stopColor="#d4593a" stopOpacity="0.85" />
+							<Stop offset="1" stopColor={colors.chartAccent} stopOpacity="0.85" />
 						</LinearGradient>
 					</Defs>
 
@@ -66,7 +71,7 @@ const MonthlyBarChart = () => {
 									y1={y}
 									x2={chartWidth}
 									y2={y}
-									stroke="rgba(0,0,0,0.08)"
+									stroke={colors.chartGridLine}
 									strokeWidth="1"
 									strokeDasharray="5 5"
 								/>
@@ -85,7 +90,7 @@ const MonthlyBarChart = () => {
 					})}
 
 					{/* Bars */}
-					{data.map((item, index) => {
+					{chartData.map((item, index) => {
 						const barHeight = (item.value / MAX_VALUE) * CHART_HEIGHT;
 						const x = CHART_PADDING_LEFT + index * (BAR_WIDTH + gap);
 						const y = CHART_HEIGHT - barHeight + CHART_PADDING_TOP;
@@ -98,8 +103,8 @@ const MonthlyBarChart = () => {
 										{/* Tooltip bubble */}
 										<Path
 											d={`M ${barCenterX - 20} ${y - 30} h 40 a 7 7 0 0 1 7 7 v 13 a 7 7 0 0 1 -7 7 h -13 l -7 7 l -7 -7 h -13 a 7 7 0 0 1 -7 -7 v -13 a 7 7 0 0 1 7 -7 z`}
-											fill="#fff9e3"
-											stroke="rgba(0,0,0,0.12)"
+											fill={colors.background}
+											stroke={colors.chartStroke}
 											strokeWidth="1"
 										/>
 										<SvgText
