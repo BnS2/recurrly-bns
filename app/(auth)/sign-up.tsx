@@ -1,5 +1,6 @@
 import { useAuth, useSignUp } from "@clerk/expo";
 import { type Href, Link, useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useState } from "react";
 import {
 	ActivityIndicator,
@@ -19,6 +20,7 @@ export default function SignUpScreen() {
 	const { signUp, errors, fetchStatus } = useSignUp();
 	const { isSignedIn } = useAuth();
 	const router = useRouter();
+	const posthog = usePostHog();
 
 	const [emailAddress, setEmailAddress] = useState("");
 	const [password, setPassword] = useState("");
@@ -51,6 +53,7 @@ export default function SignUpScreen() {
 
 			if (signUpError) {
 				logger.error("Sign Up Failed:", signUpError);
+				posthog.capture("sign_up_failed", { error_message: signUpError.message });
 				setError(signUpError.message || "Failed to create account. Please try again.");
 				return;
 			}
@@ -86,6 +89,11 @@ export default function SignUpScreen() {
 			if (signUp.status === "complete") {
 				await signUp.finalize({
 					navigate: ({ decorateUrl, session }) => {
+						posthog.identify(session?.id ?? emailAddress, {
+							$set: { email: emailAddress },
+							$set_once: { sign_up_date: new Date().toISOString() },
+						});
+						posthog.capture("user_signed_up", { method: "password" });
 						if (session?.currentTask?.key) {
 							const taskMap: Record<string, string> = {
 								"choose-organization": "/(tabs)/select-org",
@@ -103,7 +111,9 @@ export default function SignUpScreen() {
 				});
 			} else {
 				logger.error("Sign-up not complete:", signUp);
-				setError("Verification succeeded but your sign-up is not complete; please check for additional required steps or contact support.");
+				setError(
+					"Verification succeeded but your sign-up is not complete; please check for additional required steps or contact support.",
+				);
 			}
 		} catch (e) {
 			logger.error("Verification Exception:", e);
@@ -162,9 +172,9 @@ export default function SignUpScreen() {
 											keyboardType="numeric"
 											maxLength={6}
 										/>
-										{(touched.code && !isCodeValid) ? (
+										{touched.code && !isCodeValid ? (
 											<Text className="auth-error text-center">{codeErrorMsg}</Text>
-										) : (error || errors.fields.code) ? (
+										) : error || errors.fields.code ? (
 											<Text className="auth-error text-center">{error || errors.fields.code?.message}</Text>
 										) : null}
 									</View>
@@ -191,6 +201,8 @@ export default function SignUpScreen() {
 												if (resendError) {
 													logger.error("Resend Failed:", resendError);
 													setError(resendError.message || "Failed to resend code.");
+												} else {
+													posthog.capture("email_verification_resent");
 												}
 											} catch (e) {
 												logger.error("Resend Exception:", e);
@@ -259,7 +271,7 @@ export default function SignUpScreen() {
 										onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
 										keyboardType="email-address"
 									/>
-									{(touched.email && !isEmailValid) ? (
+									{touched.email && !isEmailValid ? (
 										<Text className="auth-error">{emailErrorMsg}</Text>
 									) : errors.fields.emailAddress ? (
 										<Text className="auth-error">{errors.fields.emailAddress.message}</Text>
@@ -277,7 +289,7 @@ export default function SignUpScreen() {
 										onChangeText={setPassword}
 										onBlur={() => setTouched((prev) => ({ ...prev, password: true }))}
 									/>
-									{(touched.password && !isPasswordValid) ? (
+									{touched.password && !isPasswordValid ? (
 										<Text className="auth-error">{passwordErrorMsg}</Text>
 									) : errors.fields.password ? (
 										<Text className="auth-error">{errors.fields.password.message}</Text>

@@ -2,25 +2,37 @@ import "@/global.css";
 import { ClerkProvider } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
-import { useEffect } from "react";
+import { SplashScreen, Stack, useGlobalSearchParams, usePathname } from "expo-router";
+import { PostHogProvider } from "posthog-react-native";
+import { useEffect, useRef } from "react";
 import { logger } from "@/lib/logger";
+import { posthog } from "@/lib/posthog";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-
 if (!publishableKey) {
-	throw new Error(
-		"Add your Clerk Publishable Key (EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY) to the .env.local file",
-	);
+	throw new Error("Add your Clerk Publishable Key (EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY) to the .env.local file");
 }
-
 
 export const unstable_settings = {
 	initialRouteName: "(tabs)",
 };
 
 export default function RootLayout() {
+	const pathname = usePathname();
+	const params = useGlobalSearchParams();
+	const previousPathname = useRef<string | undefined>(undefined);
+
+	useEffect(() => {
+		if (previousPathname.current !== pathname) {
+			posthog.screen(pathname, {
+				previous_screen: previousPathname.current ?? null,
+				...params,
+			});
+			previousPathname.current = pathname;
+		}
+	}, [pathname, params]);
+
 	const [fontsLoaded, fontsError] = useFonts({
 		"sans-regular": require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
 		"sans-light": require("../assets/fonts/PlusJakartaSans-Light.ttf"),
@@ -46,8 +58,17 @@ export default function RootLayout() {
 	if (!publishableKey) return null;
 
 	return (
-		<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-			<Stack screenOptions={{ headerShown: false }} />
-		</ClerkProvider>
+		<PostHogProvider
+			client={posthog}
+			autocapture={{
+				captureScreens: false,
+				captureTouches: true,
+				propsToCapture: ["testID"],
+			}}
+		>
+			<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+				<Stack screenOptions={{ headerShown: false }} />
+			</ClerkProvider>
+		</PostHogProvider>
 	);
 }

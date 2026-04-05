@@ -1,4 +1,5 @@
 import { useClerk, useUser } from "@clerk/expo";
+import { usePostHog } from "posthog-react-native";
 import { useState } from "react";
 import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import SafeAreaView from "@/components/StyledSafeAreaView";
@@ -8,11 +9,14 @@ import { logger } from "@/lib/logger";
 const Settings = () => {
 	const { user } = useUser();
 	const { signOut } = useClerk();
+	const posthog = usePostHog();
 	const [isLoggingOut, setIsLoggingOut] = useState(false);
 
 	const handleSignOut = async () => {
 		setIsLoggingOut(true);
 		try {
+			posthog.capture("user_signed_out");
+			posthog.reset();
 			await signOut();
 		} catch (error) {
 			logger.error("Error signing out:", error);
@@ -44,11 +48,7 @@ const Settings = () => {
 					disabled={isLoggingOut}
 					className={`flex-row items-center justify-center rounded-2xl bg-primary py-4 ${isLoggingOut && "opacity-50"}`}
 				>
-					{isLoggingOut ? (
-						<ActivityIndicator color="#fff" />
-					) : (
-						<Text className="auth-button-text">Logout</Text>
-					)}
+					{isLoggingOut ? <ActivityIndicator color="#fff" /> : <Text className="auth-button-text">Logout</Text>}
 				</TouchableOpacity>
 			</ScrollView>
 		</SafeAreaView>
