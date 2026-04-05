@@ -27,18 +27,22 @@ const Insights = () => {
 			>
 				{/* Upcoming Section */}
 				<View className="mt-4">
+					{/* TODO: implement viewAll handler */}
 					<ListHeading title="Upcoming" onViewAll={() => {}} />
 					<MonthlyBarChart />
 				</View>
 
 				{/* Expenses Card */}
+				{/* TODO: replace with real expense data from context/API */}
 				<ExpenseSummaryCard month="March 2026" amount="-$424.63" growth="+12%" />
 
 				{/* History Section */}
 				<View className="mt-8">
+					{/* TODO: implement viewAll handler */}
 					<ListHeading title="History" onViewAll={() => {}} />
 					<View className="flex-col gap-4 mt-4">
 						{subscriptions.map((sub: Subscription) => (
+							// TODO: implement onPress handler
 							<SubscriptionCard key={sub.id} {...sub} expanded={false} onPress={() => {}} />
 						))}
 					</View>
