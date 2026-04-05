@@ -98,6 +98,8 @@ React Native
 PostHog AI
 
 ```jsx
+import React, { useEffect } from 'react'
+import { View } from 'react-native'
 import { posthog } from './posthog'
 export function MyApp1() {
     useEffect(() => {
@@ -148,33 +150,33 @@ These are public, stable IPs used by PostHog services (e.g., Celery tasks for sn
 
 You can further customize how PostHog works through its configuration on initialization.
 
-| Attribute | Description |
-| --- | --- |
-| hostType: StringDefault: https://us.i.posthog.com | PostHog API host (usually https://us.i.posthog.com by default or https://eu.i.posthog.com). Host is optional if you use https://us.i.posthog.com. |
-| flushAtType: NumberDefault: 20 | The number of events to queue before sending to PostHog (flushing). |
-| flushIntervalType: NumberDefault: 10000 | The interval in milliseconds between periodic flushes. |
-| maxBatchSizeType: NumberDefault: 100 | The maximum number of queued messages to be flushed as part of a single batch (must be higher than flushAt). |
-| maxQueueSizeType: NumberDefault: 1000 | The maximum number of cached messages either in memory or on the local storage (must be higher than flushAt). |
-| disabledType: BooleanDefault: false | If set to true, the SDK is essentially disabled (useful for local environments where you don't want to track anything). |
-| defaultOptInType: BooleanDefault: true | If set to false, the SDK will not track until the optIn() function is called. |
-| sendFeatureFlagEventType: BooleanDefault: true | Whether to track that getFeatureFlag was called (used by experiments). |
-| preloadFeatureFlagsType: BooleanDefault: true | Whether to load feature flags when initialized or not. |
-| bootstrapType: ObjectDefault: {} | An object containing the distinctId, isIdentifiedId, featureFlags, and featureFlagPayloads keys. distinctId is a string, and featureFlags and featureFlagPayloads are objects of key-value pairs. Used to ensure data is available as soon as the SDK loads. |
-| fetchRetryCountType: NumberDefault: 3 | How many times HTTP requests will be retried. |
-| fetchRetryDelayType: NumberDefault: 3000 | The delay between HTTP request retries. |
-| requestTimeoutType: NumberDefault: 10000 | Timeout in milliseconds for any calls. |
-| featureFlagsRequestTimeoutMsType: NumberDefault: 10000 | Timeout in milliseconds for feature flag calls. |
-| sessionExpirationTimeSecondsType: NumberDefault: 1800 | For session analysis, how long before a session expires (defaults to 30 minutes). |
-| persistenceType: StringDefault: file | Allows you to provide the storage type. file will try to load the best available storage, the provided customStorage, customAsyncStorage, or in-memory storage. |
-| customAppPropertiesType: Object or FunctionDefault: null | Allows you to provide your own implementation of the common information about your App or a function to modify the default App properties generated. |
-| customStorageType: ObjectDefault: null | Allows you to provide a custom asynchronous storage such as async-storage, expo-file-system, or a synchronous storage such as mmkv. If not provided, PostHog will attempt to use the best available storage via optional peer dependencies. If persistence is set to memory, this option is ignored. |
-| captureAppLifecycleEventsType: BooleanDefault: true | Captures app lifecycle events such as Application Installed, Application Updated, Application Opened, Application Became Active, and Application Backgrounded. Enabled by default since version 4.39.0. |
-| disableGeoipType: BooleanDefault: false | When true, disables automatic GeoIP resolution for events and feature flags. |
-| enableSessionReplayType: BooleanDefault: false | Enable Recording of Session replay for Android and iOS. |
-| sessionReplayConfigType: ObjectDefault: null | Session replay configuration. See the [replay install docs](/docs/session-replay/installation.md) for more details. |
-| enablePersistSessionIdAcrossRestartType: BooleanDefault: false | When true, persists the $session_id across app restarts. If false, $session_id always resets on app restart. |
-| evaluationContextsType: Array of StringsDefault: undefined | Evaluation context tags that constrain which feature flags are evaluated. When set, only flags with matching evaluation context tags (or no evaluation context tags) will be returned. This helps reduce unnecessary flag evaluations and improves performance. See [evaluation contexts documentation](/docs/feature-flags/evaluation-contexts.md) for more details. Available in version 4.8.0+. The legacy parameter evaluationEnvironments (version 4.7.2+) is also supported for backward compatibility. |
-| before_sendType: FunctionDefault: undefined | A callback function that is called before each event is sent to PostHog. You can use it to modify, filter, or suppress events. Return null to drop the event, or return the modified event to send it. See [customizing exception capture](#customizing-exception-capture-with-before_send) for details. |
+| Attribute | Type | Default | Description |
+| --- | --- | --- | --- |
+| host | String | https://us.i.posthog.com | PostHog API host (usually https://us.i.posthog.com by default or https://eu.i.posthog.com). Host is optional if you use https://us.i.posthog.com. |
+| flushAt | Number | 20 | The number of events to queue before sending to PostHog (flushing). |
+| flushInterval | Number | 10000 | The interval in milliseconds between periodic flushes. |
+| maxBatchSize | Number | 100 | The maximum number of queued messages to be flushed as part of a single batch (must be higher than flushAt). |
+| maxQueueSize | Number | 1000 | The maximum number of cached messages either in memory or on the local storage (must be higher than flushAt). |
+| disabled | Boolean | false | If set to true, the SDK is essentially disabled (useful for local environments where you don't want to track anything). |
+| defaultOptIn | Boolean | true | If set to false, the SDK will not track until the optIn() function is called. |
+| sendFeatureFlagEvent | Boolean | true | Whether to track that getFeatureFlag was called (used by experiments). |
+| preloadFeatureFlags | Boolean | true | Whether to load feature flags when initialized or not. |
+| bootstrap | Object | {} | An object containing the distinctId, isIdentifiedId, featureFlags, and featureFlagPayloads keys. distinctId is a string, and featureFlags and featureFlagPayloads are objects of key-value pairs. Used to ensure data is available as soon as the SDK loads. |
+| fetchRetryCount | Number | 3 | How many times HTTP requests will be retried. |
+| fetchRetryDelay | Number | 3000 | The delay between HTTP request retries. |
+| requestTimeout | Number | 10000 | Timeout in milliseconds for any calls. |
+| featureFlagsRequestTimeoutMs | Number | 10000 | Timeout in milliseconds for feature flag calls. |
+| sessionExpirationTimeSeconds | Number | 1800 | For session analysis, how long before a session expires (defaults to 30 minutes). |
+| persistence | String | file | Allows you to provide the storage type. file will try to load the best available storage, the provided customStorage, customAsyncStorage, or in-memory storage. |
+| customAppProperties | Object or Function | null | Allows you to provide your own implementation of the common information about your App or a function to modify the default App properties generated. |
+| customStorage | Object | null | Allows you to provide a custom asynchronous storage such as async-storage, expo-file-system, or a synchronous storage such as mmkv. If not provided, PostHog will attempt to use the best available storage via optional peer dependencies. If persistence is set to memory, this option is ignored. |
+| captureAppLifecycleEvents | Boolean | true | Captures app lifecycle events such as Application Installed, Application Updated, Application Opened, Application Became Active, and Application Backgrounded. Enabled by default since version 4.39.0. |
+| disableGeoip | Boolean | false | When true, disables automatic GeoIP resolution for events and feature flags. |
+| enableSessionReplay | Boolean | false | Enable Recording of Session replay for Android and iOS. |
+| sessionReplayConfig | Object | null | Session replay configuration. See the [replay install docs](/docs/session-replay/installation.md) for more details. |
+| enablePersistSessionIdAcrossRestart | Boolean | false | When true, persists the $session_id across app restarts. If false, $session_id always resets on app restart. |
+| evaluationContexts | Array of Strings | undefined | Evaluation context tags that constrain which feature flags are evaluated. When set, only flags with matching evaluation context tags (or no evaluation context tags) will be returned. This helps reduce unnecessary flag evaluations and improves performance. See [evaluation contexts documentation](/docs/feature-flags/evaluation-contexts.md) for more details. Available in version 4.8.0+. The legacy parameter evaluationEnvironments (version 4.7.2+) is also supported for backward compatibility. |
+| before_send | Function | undefined | A callback function that is called before each event is sent to PostHog. You can use it to modify, filter, or suppress events. Return null to drop the event, or return the modified event to send it. See [customizing exception capture](#customizing-exception-capture-with-before_send) for details. |
 
 ## Capturing events
 
@@ -1186,7 +1188,7 @@ await PostHog.setup('<ph_project_token>', {
 PostHog.capture("foo")
 // V2 Setup difference
 import PostHog from 'posthog-react-native'
-const posthog = await Posthog.initAsync('<ph_project_token>', {
+const posthog = await PostHog.initAsync('<ph_project_token>', {
     // usually 'https://us.i.posthog.com' or 'https://eu.i.posthog.com'
     host: 'https://us.i.posthog.com',
     // Add any other options here.
@@ -1221,4 +1223,5 @@ Ask a question
 
 ### Was this page useful?
 
-HelpfulCould be better
+- Helpful
+- Could be better
