@@ -280,7 +280,7 @@
 	@apply flex-1 bg-black/50;
 }
 @utility modal-container {
-	@apply mt-auto max-h-[85%] rounded-t-3xl bg-background;
+	@apply mt-auto max-h-[85%] overflow-hidden border-t border-border bg-card shadow-2xl;
 }
 @utility modal-header {
 	@apply flex-row items-center justify-between border-b border-border px-5 py-4;
@@ -289,10 +289,10 @@
 	@apply font-sans-bold text-xl text-primary;
 }
 @utility modal-close {
-	@apply size-8 items-center justify-center rounded-full bg-muted;
+	@apply size-10 items-center justify-center rounded-full bg-muted;
 }
 @utility modal-close-text {
-	@apply font-sans-bold text-lg text-primary;
+	@apply font-sans-bold text-2xl leading-none text-primary;
 }
 @utility modal-body {
 	@apply gap-5 p-5;

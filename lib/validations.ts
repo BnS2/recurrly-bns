@@ -16,3 +16,13 @@ export const mfaSchema = z.object({
 export const backupCodeSchema = z.object({
 	code: z.string().min(8, "Please enter a valid backup code."),
 });
+
+export const subscriptionSchema = z.object({
+	name: z.string().min(1, "Please enter a subscription name."),
+	price: z.preprocess(
+		(val) => (val === "" ? undefined : Number(val)),
+		z.number().positive("Price must be a positive number."),
+	),
+	billing: z.enum(["Monthly", "Yearly"]),
+	category: z.string().min(1, "Category is required."),
+});
