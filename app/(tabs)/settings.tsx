@@ -16,8 +16,12 @@ const Settings = () => {
 		setIsLoggingOut(true);
 		try {
 			posthog.capture("user_signed_out");
-			await posthog.flush();
-			posthog.reset();
+			try {
+				await posthog.flush();
+				posthog.reset();
+			} catch (analyticsError) {
+				logger.error("Analytics error during sign out:", analyticsError);
+			}
 			await signOut();
 		} catch (error) {
 			logger.error("Error signing out:", error);

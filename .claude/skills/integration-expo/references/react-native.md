@@ -6,7 +6,7 @@ Our React Native enables you to integrate PostHog with your React Native project
 
 To install, add the `posthog-react-native` package to your project as well as the required peer dependencies.
 
-#### Expo apps
+### Expo apps
 
 Terminal
 
@@ -1103,12 +1103,14 @@ PostHog AI
 
 ```jsx
 <PostHogProvider
-    debug: {true}
+    debug={true}
     apiKey="<ph_project_token>"
     options={{
         host: "https://us.i.posthog.com",
     }}
 >
+    <App />
+</PostHogProvider>
 ```
 
 You can also call the `debug()` method in your code.

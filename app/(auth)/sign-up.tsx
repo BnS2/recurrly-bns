@@ -89,10 +89,12 @@ export default function SignUpScreen() {
 			if (signUp.status === "complete") {
 				await signUp.finalize({
 					navigate: ({ decorateUrl, session }) => {
-						posthog.identify(session?.user?.id ?? emailAddress, {
-							$set: { email: emailAddress },
-							$set_once: { sign_up_date: new Date().toISOString() },
-						});
+						if (session?.user?.id) {
+							posthog.identify(session.user.id, {
+								$set: { email: emailAddress },
+								$set_once: { sign_up_date: new Date().toISOString() },
+							});
+						}
 						posthog.capture("user_signed_up", { method: "password" });
 						if (session?.currentTask?.key) {
 							const taskMap: Record<string, string> = {
