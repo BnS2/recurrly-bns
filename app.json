@@ -1,7 +1,7 @@
 {
 	"expo": {
 		"name": "Recurrly",
-		"slug": "recurrly",
+		"slug": "recurrly-bns",
 		"version": "1.0.0",
 		"orientation": "portrait",
 		"icon": "./assets/icons/logo.png",
