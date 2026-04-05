@@ -5,6 +5,7 @@ import { useFonts } from "expo-font";
 import { SplashScreen, Stack, useGlobalSearchParams, usePathname } from "expo-router";
 import { PostHogProvider } from "posthog-react-native";
 import { useCallback, useEffect, useRef } from "react";
+import { SubscriptionProvider } from "@/context/SubscriptionContext";
 import { logger } from "@/lib/logger";
 import { posthog } from "@/lib/posthog";
 
@@ -94,9 +95,11 @@ export default function RootLayout() {
 				propsToCapture: ["testID"],
 			}}
 		>
-			<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
-				<Stack screenOptions={{ headerShown: false }} />
-			</ClerkProvider>
+			<SubscriptionProvider>
+				<ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+					<Stack screenOptions={{ headerShown: false }} />
+				</ClerkProvider>
+			</SubscriptionProvider>
 		</PostHogProvider>
 	);
 }
