@@ -8,7 +8,7 @@ const isPostHogConfigured = !!apiKey && apiKey !== "phc_your_project_token_here"
 if (!isPostHogConfigured) {
 	console.warn(
 		"PostHog project token not configured. Analytics will be disabled. " +
-			"Set POSTHOG_PROJECT_TOKEN in your .env file to enable analytics.",
+			"Set EXPO_PUBLIC_POSTHOG_PROJECT_TOKEN in your .env file to enable analytics.",
 	);
 }
 
